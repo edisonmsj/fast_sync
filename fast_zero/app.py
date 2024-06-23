@@ -67,6 +67,11 @@ def read_users():
     return {'users': database}
 
 
+@app.get('/users/{id}', status_code=HTTPStatus.OK, response_model=UserPublic)
+def read_user(id: int):
+    return database[id - 1]
+
+
 @app.put('/users/{user_id}', response_model=UserPublic)
 def update_user(user_id: int, user: UserSchema):
     if user_id > len(database) or user_id < 1:
