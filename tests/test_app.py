@@ -1,4 +1,5 @@
 from http import HTTPStatus
+
 from fast_zero.schemas import UserPublic
 
 
