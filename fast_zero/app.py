@@ -1,13 +1,13 @@
 from http import HTTPStatus
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
-from fast_zero.models import User
-
-from fast_zero.schemas import Message, UserDB, UserList, UserPublic, UserSchema
-from sqlalchemy import create_engine, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
-from fast_zero.settings import Settings
+
+from fast_zero.database import get_session
+from fast_zero.models import User
+from fast_zero.schemas import Message, UserDB, UserList, UserPublic, UserSchema
 
 app = FastAPI()
 
@@ -58,14 +58,12 @@ database = []
 
 
 @app.post('/users/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema):
-    engine = create_engine(Settings().DATABASE_URL)
-
-    with Session(engine) as session:
-        db_user = session.scalar(
-            select(User).where(
-               (User.username == user.username) | (User.email == user.email))
+def create_user(user: UserSchema, session: Session = Depends(get_session)):
+    db_user = session.scalar(
+        select(User).where(
+            (User.username == user.username) | (User.email == user.email)
         )
+    )
 
     if db_user:
         if db_user.username == user.username:
@@ -91,13 +89,18 @@ def create_user(user: UserSchema):
 
 
 @app.get('/users/', status_code=HTTPStatus.OK, response_model=UserList)
-def read_users():
-    return {'users': database}
+def read_users(
+    limit: int = 10,
+    offset: int = 0,
+    session: Session = Depends(get_session)):
+    user = session.scalars(select(User).limit(limit).offset(offset))
+    return {'users': user}
 
 
 @app.get('/users/{id}', status_code=HTTPStatus.OK, response_model=UserPublic)
-def read_user(id: int):
-    return database[id - 1]
+def read_user(id: int, session: Session = Depends(get_session)):
+    user = session.scalar(select(User).where(User.id == id))
+    return user
 
 
 @app.put('/users/{user_id}', response_model=UserPublic)
