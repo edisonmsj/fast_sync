@@ -36,6 +36,30 @@ def test_create_user(client):
     }
 
 
+def test_post_username_duplicated(client, user):
+    response = client.post(
+        '/users/',
+        json={
+            'username': 'alice',
+            'email': 'alice@test.com',
+            'password': 'secrett',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+
+
+def test_post_email_duplicated(client, user):
+    response = client.post(
+        '/users/',
+        json={
+            'username': 'alice',
+            'email': 'teste@test.com',
+            'password': 'secrett',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+
+
 def test_read_users(client):
     response = client.get('/users/')
     assert response.status_code == HTTPStatus.OK
