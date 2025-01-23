@@ -115,7 +115,7 @@ def update_user(
 
     db_user.username = user.username
     db_user.email = user.email
-    db_user.password = user.password
+    db_user.password = get_password_hash(user.password)
 
     session.add(db_user)
     session.commit()
