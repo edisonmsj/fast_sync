@@ -77,8 +77,8 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
 
     db_user = User(
         username=user.username,
-          password= get_password_hash(user.password),
-            email=user.email
+        password=get_password_hash(user.password),
+        email=user.email,
     )
 
     session.add(db_user)
