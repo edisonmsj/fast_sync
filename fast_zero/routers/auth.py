@@ -16,7 +16,7 @@ from fast_zero.security import (
 router = APIRouter(prefix='/auth', tags=['auth'])
 
 
-@router.post('/', response_model=Token)
+@router.post('/token', response_model=Token)
 def login_for_access_token(
     # O depends vazio indica que o tipo precisa ser respeitado
     form_data: OAuth2PasswordRequestForm = Depends(),

@@ -44,7 +44,7 @@ def create_access_token(data_payload: dict) -> str:
     return encoded_jwt
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 
 
 def get_current_user(
