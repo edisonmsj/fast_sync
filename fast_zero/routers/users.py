@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -13,20 +14,22 @@ from fast_zero.security import (
 )
 
 router = APIRouter(prefix='/users', tags=['users'])
+T_Session = Annotated[Session, Depends(get_session)]
+T_CurrentUser = Annotated[UserPublic, Depends(get_current_user)]
 
 
 @router.get('/', status_code=HTTPStatus.OK, response_model=UserList)
 def read_users(
+    session: T_Session,
     limit: int = 10,
     offset: int = 0,
-    session: Session = Depends(get_session),
 ):
     user = session.scalars(select(User).limit(limit).offset(offset))
     return {'users': user}
 
 
 @router.get('/{id}', status_code=HTTPStatus.OK, response_model=UserPublic)
-def read_user(id: int, session: Session = Depends(get_session)):
+def read_user(id: int, session: T_Session):
     user = session.scalar(select(User).where(User.id == id))
     return user
 
@@ -35,8 +38,8 @@ def read_user(id: int, session: Session = Depends(get_session)):
 def update_user(
     user_id: int,
     user: UserSchema,
-    session: Session = Depends(get_session),
-    current_user: UserPublic = Depends(get_current_user),
+    session: T_Session,
+    current_user: T_CurrentUser,
 ):
     if current_user.id != user_id:
         raise HTTPException(
@@ -58,8 +61,8 @@ def update_user(
 @router.delete('/{user_id}', response_model=Message)
 def delete_user(
     user_id: int,
-    session: Session = Depends(get_session),
-    current_user: UserPublic = Depends(get_current_user),
+    session: T_Session,
+    current_user: T_CurrentUser,
 ):
     if current_user.id != user_id:
         raise HTTPException(
@@ -74,7 +77,7 @@ def delete_user(
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema, session: Session = Depends(get_session)):
+def create_user(user: UserSchema, session: T_Session):
     db_user = session.scalar(
         select(User).where(
             (User.username == user.username) | (User.email == user.email)
