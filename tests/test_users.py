@@ -86,6 +86,15 @@ def test_delete_invalid_user(client):
     assert response.status_code == HTTPStatus.UNAUTHORIZED
 
 
+def test_delete_wrong_user(client, user, token):
+    response = client.delete(
+        f'/users/{user.id + 1}', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permission'}
+
+
 def test_post_username_duplicated(client, user):
     response = client.post(
         '/users/',
