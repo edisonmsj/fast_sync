@@ -99,9 +99,9 @@ def test_post_username_duplicated(client, user):
     response = client.post(
         '/users/',
         json={
-            'username': 'alice',
-            'email': 'alice@test.com',
-            'password': 'secrett',
+            'username': user.username,
+            'email': user.email,
+            'password': user.password,
         },
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -111,9 +111,9 @@ def test_post_email_duplicated(client, user):
     response = client.post(
         '/users/',
         json={
-            'username': 'alice',
-            'email': 'teste@test.com',
-            'password': 'secrett',
+            'username': user.username,
+            'email': user.email,
+            'password': user.password,
         },
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
