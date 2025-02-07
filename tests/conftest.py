@@ -77,16 +77,11 @@ def user(session):
 
 @pytest.fixture()
 def other_user(session):
-    pwd = 'secret'
-    user = UserFactory(
-        password=get_password_hash(pwd),
-    )
+    user = UserFactory()
 
     session.add(user)
     session.commit()
     session.refresh(user)
-
-    user.clean_password = pwd  # Monkey Patch
 
     return user
 
