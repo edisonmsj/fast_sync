@@ -33,7 +33,8 @@ def test_token_expired_after_time(client, user):
             json={
                 'username': 'bob',
                 'email': 'wrong@wrong.com',
-                'password': 'wrong'}
+                'password': 'wrong',
+            },
         )
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
