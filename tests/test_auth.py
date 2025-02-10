@@ -39,3 +39,13 @@ def test_token_expired_after_time(client, user):
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
         assert response.json() == {'detail': 'Could not validate credentials'}
+
+
+def test_token_wrong_password(client, user):
+    response = client.post(
+        '/auth/token',
+        data={'username': user.username, 'password': 'wrongpassword'},
+    )
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Could not validate credentials'}
