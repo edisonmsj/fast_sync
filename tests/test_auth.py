@@ -48,4 +48,14 @@ def test_token_wrong_password(client, user):
     )
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
-    assert response.json() == {'detail': 'Could not validate credentials'}
+    assert response.json() == {'detail': 'Incorrect username or password'}
+
+
+def test_token_wrong_user(client, user):
+    response = client.post(
+        '/auth/token',
+        data={'username': 'teste', 'password': user.clean_password},
+    )
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Incorrect username or password'}
