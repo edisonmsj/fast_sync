@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 
+from fast_zero.models import TodoState
+
 
 class Message(BaseModel):
     message: str
@@ -35,4 +37,3 @@ class TodoSchema(BaseModel):
 
 class TodoPublic(TodoSchema):
     id: int
-
