@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import func, ForeignKey
+from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, registry
 
 table_registry = registry()
@@ -30,6 +30,8 @@ class User:
         init=False, server_default=func.now(), onupdate=func.now()
     )
 
+
+@table_registry.mapped_as_dataclass
 class Todo:
     __tablename__ = 'todos'
 
@@ -37,7 +39,7 @@ class Todo:
     title: Mapped[str]
     description: Mapped[str]
     state: Mapped[TodoState]
-    used_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     created_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now()
     )
