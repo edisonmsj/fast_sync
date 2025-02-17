@@ -49,6 +49,6 @@ def list_todos(
     if state:
         query = query.filter(Todo.state == state)
 
-    todos = session.scalars(query.offset(offset).limit(limit).all())
+    todos = session.scalars(query.offset(offset).limit(limit)).all()
 
     return {'todos': todos}
