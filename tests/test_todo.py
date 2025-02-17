@@ -153,3 +153,34 @@ def test_delete_todo_error(client, token):
 
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == {'detail': 'Task not found'}
+
+
+def test_patch_todo(session, client, user, token):
+    todo = TodoFactory(user_id=user.id)
+    session.add(todo)
+    session.commit()
+
+    response = client.patch(
+        f'/todos/{todo.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={'title': 'New title'},
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        'id': todo.id,
+        'title': 'New title',
+        'description': todo.description,
+        'state': todo.state,
+    }
+
+
+def test_patch_todo_error(client, token):
+    response = client.patch(
+        '/todos/1',
+        headers={'Authorization': f'Bearer {token}'},
+        json={'title': 'New title'},
+    )
+
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Task not found'}
