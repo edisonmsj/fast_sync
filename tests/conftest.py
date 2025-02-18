@@ -43,17 +43,25 @@ def client(session):
     app.dependency_overrides.clear()
 
 
-@pytest.fixture(scope='function')
-def session():
+@pytest.fixture(scope='session')
+def engine():
     with PostgresContainer('postgres:17', driver='psycopg') as postgres:
-        engine = create_engine(postgres.get_connection_url())
-        table_registry.metadata.create_all(engine)
+        _engine = create_engine(postgres.get_connection_url())
+        table_registry.metadata.create_all(_engine)
 
-        with Session(engine) as session:
-            yield session
-            session.rollback()
+        with _engine.begin():
+            yield _engine
 
-        table_registry.metadata.drop_all(engine)
+
+@pytest.fixture()
+def session(engine):
+    table_registry.metadata.create_all(engine)
+
+    with Session(engine) as session:
+        yield session
+        session.rollback()
+
+    table_registry.metadata.drop_all(engine)
 
 
 @pytest.fixture()
