@@ -1,5 +1,8 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from fast_zero.routers import auth, todo, users
 
@@ -9,43 +12,16 @@ app.include_router(auth.router)
 app.include_router(todo.router)
 
 
-@app.get('/', response_class=HTMLResponse)
-def read_root():
-    return """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Hello World</title>
-        <style>
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-                background: linear-gradient(to right, #ff7e5f, #feb47b);
-                font-family: 'Arial', sans-serif;
-            }
-            .container {
-                text-align: center;
-                color: #fff;
-            }
-            h1 {
-                font-size: 4em;
-                animation: fadeIn 3s ease-in-out;
-            }
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Olá Mundo</h1>
-        </div>
-    </body>
-    </html>
-    """
+# Caminho absoluto para o diretório 'static'
+static_directory = os.path.join(os.getcwd(), 'static')
+
+# Monta a pasta 'static' como a raiz para arquivos estáticos
+app.mount("/static", StaticFiles(directory=os.path.join(os.getcwd(),
+ "fast_zero", "static")), name="static")
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    landing_page_path = os.path.join(
+        os.getcwd(), "fast_zero", "static", "templates", "landing_page.html")
+    with open(landing_page_path, "r", encoding="utf-8") as file:
+        return HTMLResponse(content=file.read())
